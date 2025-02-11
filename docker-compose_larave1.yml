@@ -1,0 +1,54 @@
+# 此docker-compose建立laravel專案相關容器：使用php+apache image/ mysql image/ composer image
+# 無使用docker-file生成image
+# laravel實體專案建立在本地/php-apache01021-data目錄內；
+# composer也要設定使用下載(laravel)後，放置的目錄./php-apache01021-data
+# mysql01021-data本地目錄掛在mysql01021-data
+services:
+  php-apache01021:
+    image: php:8.2-apache  # 使用預建鏡像，已包含必要的 PHP 擴展
+    container_name: php-apache01021
+    restart: always
+    ports: 
+      - "8000:80"
+    volumes:
+      - ./php-apache01021-data:/var/www/html
+    networks:
+      - shared-network
+    depends_on:
+      - mysql01021
+  mysql01021:
+    image: mysql:8.0
+    container_name: mysql01021
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: mydb
+      MYSQL_USER: user
+      MYSQL_PASSWORD: userpassword
+    ports: 
+      - "3307:3306"
+    volumes:
+      - mysql01021-data:/var/lib/mysql
+    networks:
+      - shared-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  composer01021:
+    image: composer:latest
+    container_name: composer01021
+    volumes:
+      - ./php-apache01021-data:/var/www/html  # 與 PHP-Apache 共享代碼目錄
+    working_dir: /var/www/html
+    networks:
+      - shared-network
+    depends_on:
+      - mysql01021
+    # 不需要預設的 command，讓它作為一個工具容器使用
+networks:
+  shared-network:
+volumes:
+  php-apache01021-data:
+  mysql01021-data:
