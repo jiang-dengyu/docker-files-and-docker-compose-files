@@ -1,0 +1,40 @@
+services:
+  php-apache02121:
+    build:
+      context: . # 指定 Dockerfile 所在目錄
+      dockerfile: Dockerfile # 指定 Dockerfile 名稱
+    container_name: php-apache02121
+    restart: always
+    ports:
+      - "8000:80"
+    volumes:
+      - ./php-apache02121-data:/var/www/html
+    networks:
+      - shared-network
+    depends_on:
+      - mysql02121
+  mysql02121:
+    image: mysql:8.0
+    container_name: mysql02121
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: mydb
+      MYSQL_USER: user
+      MYSQL_PASSWORD: userpassword
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql02121-data:/var/lib/mysql
+    networks:
+      - shared-network
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+networks:
+  shared-network:
+volumes:
+  php-apache02121-data:
+  mysql02121-data:
