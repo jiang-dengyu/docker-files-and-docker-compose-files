@@ -3,7 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: php02121
+    container_name: php02121_apa_php
     restart: always
     volumes:
       - ./php-apache02121-data:/var/www/html
@@ -13,14 +13,18 @@ services:
       - mysql02121
 
   apache:
-    image: httpd:2.4
-    container_name: apache02121
+    image: httpd:latest # 使用最新的 Apache
+    container_name: apache02121_apa_php
     restart: always
     ports:
-      - "8000:80"
+      - "8080:80" # 改用 8080 來避免 Port 80 衝突
     volumes:
       - ./php-apache02121-data:/var/www/html
-      - ./apache-config.conf:/usr/local/apache2/conf/httpd.conf
+      - ./apache-conf/httpd.conf:/usr/local/apache2/conf/httpd.conf
+      - ./apache-logs:/usr/local/apache2/logs # 確保 Apache 能夠寫入日誌
+    environment:
+      - APACHE_RUN_USER=www-data
+      - APACHE_RUN_GROUP=www-data
     networks:
       - shared-network
     depends_on:
@@ -28,7 +32,7 @@ services:
 
   mysql02121:
     image: mysql:8.0
-    container_name: mysql02121
+    container_name: mysql02121_apa_php
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword

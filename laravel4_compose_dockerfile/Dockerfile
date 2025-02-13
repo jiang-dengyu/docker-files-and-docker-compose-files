@@ -23,5 +23,10 @@ RUN chown -R www-data:www-data /var/www/html \
   && mkdir -p /var/www/html/storage /var/www/html/bootstrap/cache \
   && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
+# 確保 Apache 日誌目錄存在
+RUN mkdir -p /usr/local/apache2/logs/ \
+  && touch /usr/local/apache2/logs/error.log /usr/local/apache2/logs/access.log \
+  && chmod -R 777 /usr/local/apache2/logs/
+
 # 預設啟動 PHP-FPM
 CMD ["php-fpm"]
