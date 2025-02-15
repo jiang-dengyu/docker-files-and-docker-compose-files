@@ -17,10 +17,10 @@ services:
     container_name: apache02121_apa_php
     restart: always
     ports:
-      - "8080:80" # 改用 8080 來避免 Port 80 衝突
+      - "8000:80" # 改用 8080 來避免 Port 80 衝突
     volumes:
       - ./php-apache02121-data:/var/www/html
-      - ./apache-conf/httpd.conf:/usr/local/apache2/conf/httpd.conf
+      - ./apache-conf/httpd.conf:/usr/local/apache2/conf/httpd.conf:ro
       - ./apache-logs:/usr/local/apache2/logs # 確保 Apache 能夠寫入日誌
     environment:
       - APACHE_RUN_USER=www-data
